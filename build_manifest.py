@@ -17,8 +17,8 @@ DRONE = re.compile(r"^(.+?)-(bebop|membo)_(\d+)_\.wav$")
 FLAT = re.compile(r"^(.*?)(\d+)\.wav$")
 
 
+# spits back (recording_id, family, model, augmented) for esc50-style names, or None.
 def parse_esc50(name):
-    """spits back (recording_id, family, model, augmented) for esc50-style names, or None."""
     match_obj = ESC50.match(name)
     if not match_obj:
         return None
@@ -27,8 +27,8 @@ def parse_esc50(name):
     return f"esc50_{fold}-{clip}-{take}", "esc50", None, False
 
 
+# spits back tuple for drone-style names, or None.
 def parse_drone(name):
-    """spits back tuple for drone-style names, or None."""
     match_obj = DRONE.match(name)
     if not match_obj:
         return None
@@ -38,8 +38,8 @@ def parse_drone(name):
     return f"drone_{stem}", "mixed" if augmented else "clean", model, augmented
 
 
+# guesstimates recording_id, family, model, augmented. recording_id is the only thing that matters.
 def classify(name, label):
-    """guesstimates recording_id, family, model, augmented. recording_id is the only thing that matters."""
     # try esc50 first
     result = parse_esc50(name)
     if result:
@@ -65,8 +65,8 @@ def classify(name, label):
     return f"unparsed_{name}", "unparsed", None, False
 
 
+# reads wav header and returns seconds as float, rounded to 4 decimals.
 def duration(path):
-    """reads wav header and returns seconds as float, rounded to 4 decimals."""
     with wave.open(str(path)) as w:
         return round(w.getnframes() / w.getframerate(), 4)
 
