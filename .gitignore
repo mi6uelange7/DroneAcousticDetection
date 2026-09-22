@@ -2,3 +2,6 @@
 __pycache__/
 .pytest_cache/
 *.pyc
+data/
+*.npy
+NOTES.txt

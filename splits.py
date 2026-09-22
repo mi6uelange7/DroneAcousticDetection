@@ -62,17 +62,23 @@ def compute_naive_split(entries, rng_seed, test_frac=0.2):
 
 
 def print_summary(title, entries, assign_map):
-    # dumps group count, clip count, pos/neg, family breakdown per split.
-    # just so you can eyeball if test ended up with barely any drones
+    # dumps group count, clip count, pos/neg, silent count, family breakdown
+    # per split. just so you can eyeball if test ended up with barely any
+    # drones, or loaded up on silence
     print(f"\n{title}")
     for split in ("train", "test"):
         split_entries = [r for r in entries if assign_map[r["path"]] == split]
         num_groups = len({r["group_id"] for r in split_entries})
         positive_count = sum(int(r["label"]) for r in split_entries)
         negative_count = len(split_entries) - positive_count
+        # silent count here is the actual thing to check: if its close to even
+        # across train and test, silent clips arent giving either side an edge
+        silent_count = sum(int(r["silent"]) for r in split_entries)
+        silent_pct = 100 * silent_count / len(split_entries)
         print(
             f"  {split:5s} {len(split_entries):6d} clips  {num_groups:5d} groups  "
-            + f"positives {positive_count:5d}  negatives {negative_count:6d}"
+            + f"positives {positive_count:5d}  negatives {negative_count:6d}  "
+            + f"silent {silent_count:5d} ({silent_pct:.1f}%)"
         )
 
         fam_counter = Counter(r["family"] for r in split_entries)
