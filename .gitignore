@@ -5,3 +5,4 @@ __pycache__/
 data/
 *.npy
 NOTES.txt
+status_update.html
