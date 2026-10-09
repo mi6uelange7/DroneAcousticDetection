@@ -1,4 +1,5 @@
 # Drone Acoustic Detection
+[Supporting Doc](https://docs.google.com/document/d/1spNegbq3fJYjnkqIqJ_GkmG4IBpcOqkOcpvHhn9j29M/edit?usp=sharing)
 
 A model that listens to a one second audio clip and says whether there's a drone in it. It's a CNN trained on spectrograms (pictures of sound), plus a simpler baseline model to compare it against.
 
