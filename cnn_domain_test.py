@@ -19,6 +19,7 @@ from train import DEVICE, SpectrogramDataset, train_model, train_norm_stats
 def domain_probs(model, entries, root, mean, std):
     specs = np.stack([spectrogram(Path(root) / r["path"]) for r in entries])
     specs = (specs.astype(np.float32) - mean) / std
+    # numpy -> torch, unsqueeze(1) adds the channel dimension (same as [None] in train.py), then to cpu/gpu
     specs = torch.from_numpy(specs).unsqueeze(1).to(DEVICE)
 
     model.eval()

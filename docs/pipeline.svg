@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1420 880" width="1420" height="880" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="tip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1d2230"/></marker></defs>
+<rect width="1420" height="880" fill="#ffffff"/>
+<line x1="170.0" y1="102.0" x2="170.0" y2="168.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="285.0" y1="200.0" x2="365.0" y2="200.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="170.0" y1="232.0" x2="170.0" y2="308.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="231.7" y1="308.0" x2="396.2" y2="222.7" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="170.0" y1="372.0" x2="170.0" y2="448.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="222.6" y1="512.0" x2="360.8" y2="596.1" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="263.7" y1="512.0" x2="522.7" y2="600.4" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="170.0" y1="512.0" x2="170.0" y2="608.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="400.0" y1="648.0" x2="400.0" y2="738.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="549.0" y1="645.8" x2="438.4" y2="738.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="444.9" y1="642.4" x2="636.0" y2="738.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="601.6" y1="647.0" x2="674.4" y2="738.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="478.9" y1="223.9" x2="648.0" y2="328.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="700.0" y1="392.0" x2="700.0" y2="462.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="700.0" y1="518.0" x2="700.0" y2="738.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="503.4" y1="215.0" x2="875.0" y2="302.8" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="1250.0" y1="102.0" x2="1250.0" y2="168.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="1250.0" y1="232.0" x2="1250.0" y2="302.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="1150.0" y1="330.0" x2="1105.0" y2="330.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="768.2" y1="501.6" x2="995.0" y2="540.4" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<line x1="1233.2" y1="357.6" x2="1129.5" y2="528.0" stroke="#1d2230" stroke-width="1.6" marker-end="url(#tip)"/>
+<rect x="40.0" y="38.0" width="260" height="64" rx="4" fill="#7dc27a"/>
+<text x="170" y="66" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">1st dataset</text>
+<text x="170" y="85" text-anchor="middle" font-size="12" fill="#3a4256">11,704 one-second .wav clips</text>
+<rect x="55.0" y="168.0" width="230" height="64" rx="12" fill="#78bfef"/>
+<text x="170" y="196" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">build_manifest.py</text>
+<text x="170" y="215" text-anchor="middle" font-size="12" fill="#3a4256">tags each clip with its recording</text>
+<ellipse cx="440" cy="200" rx="75.0" ry="28.0" fill="#e07bb0"/>
+<text x="440" y="205" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">manifest.csv</text>
+<rect x="55.0" y="308.0" width="230" height="64" rx="12" fill="#78bfef"/>
+<text x="170" y="336" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">detect_silence.py</text>
+<text x="170" y="355" text-anchor="middle" font-size="12" fill="#3a4256">flags silent clips in the manifest</text>
+<rect x="55.0" y="448.0" width="230" height="64" rx="12" fill="#78bfef"/>
+<text x="170" y="476" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">splits.py</text>
+<text x="170" y="495" text-anchor="middle" font-size="12" fill="#3a4256">makes the honest + leaky splits</text>
+<rect x="55.0" y="608.0" width="230" height="64" rx="12" fill="#78bfef"/>
+<text x="170" y="636" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">test_no_leakage.py</text>
+<text x="170" y="655" text-anchor="middle" font-size="12" fill="#3a4256">proves no recording is on both sides</text>
+<ellipse cx="400" cy="620" rx="75.0" ry="28.0" fill="#e07bb0"/>
+<text x="400" y="616" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">splits.csv</text>
+<text x="400" y="635" text-anchor="middle" font-size="12" fill="#3a4256">honest</text>
+<ellipse cx="580" cy="620" rx="80.0" ry="28.0" fill="#e07bb0"/>
+<text x="580" y="616" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">splits_naive.csv</text>
+<text x="580" y="635" text-anchor="middle" font-size="12" fill="#3a4256">leaky on purpose</text>
+<rect x="285.0" y="738.0" width="230" height="64" rx="12" fill="#78bfef"/>
+<text x="400" y="766" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">baseline.py</text>
+<text x="400" y="785" text-anchor="middle" font-size="12" fill="#3a4256">40 MFCCs -&gt; logistic regression</text>
+<rect x="585.0" y="328.0" width="230" height="64" rx="12" fill="#f4a259"/>
+<text x="700" y="356" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">features.py</text>
+<text x="700" y="375" text-anchor="middle" font-size="12" fill="#3a4256">each clip -&gt; 64x65 spectrogram</text>
+<ellipse cx="700" cy="490" rx="75.0" ry="28.0" fill="#e07bb0"/>
+<text x="700" y="486" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">spectrograms/</text>
+<text x="700" y="505" text-anchor="middle" font-size="12" fill="#3a4256">saved once as .npy</text>
+<rect x="585.0" y="738.0" width="230" height="64" rx="12" fill="#f4a259"/>
+<text x="700" y="766" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">train.py</text>
+<text x="700" y="785" text-anchor="middle" font-size="12" fill="#3a4256">small CNN, honest + leaky models</text>
+<rect x="1120.0" y="38.0" width="260" height="64" rx="4" fill="#7dc27a"/>
+<text x="1250" y="66" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">2nd dataset</text>
+<text x="1250" y="85" text-anchor="middle" font-size="12" fill="#3a4256">546 clips, different mic + location</text>
+<rect x="1135.0" y="168.0" width="230" height="64" rx="12" fill="#78bfef"/>
+<text x="1250" y="196" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">domain_manifest.py</text>
+<text x="1250" y="215" text-anchor="middle" font-size="12" fill="#3a4256">lists the 2nd dataset's clips</text>
+<ellipse cx="1250" cy="330" rx="100.0" ry="28.0" fill="#e07bb0"/>
+<text x="1250" y="335" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">domain_manifest.csv</text>
+<rect x="875.0" y="298.0" width="230" height="64" rx="12" fill="#78bfef"/>
+<text x="990" y="326" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">domain_test.py</text>
+<text x="990" y="345" text-anchor="middle" font-size="12" fill="#3a4256">baseline: train on 1, test on 2</text>
+<rect x="995.0" y="528.0" width="230" height="64" rx="12" fill="#f4a259"/>
+<text x="1110" y="556" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2230">cnn_domain_test.py</text>
+<text x="1110" y="575" text-anchor="middle" font-size="12" fill="#3a4256">CNN: train on 1, test on 2</text>
+<rect x="950" y="700" width="22" height="16" rx="3" fill="#78bfef"/>
+<text x="982" y="713" font-size="14" fill="#1d2230">data pipeline + baseline model</text>
+<rect x="950" y="730" width="22" height="16" rx="3" fill="#f4a259"/>
+<text x="982" y="743" font-size="14" fill="#1d2230">CNN model</text>
+<rect x="950" y="760" width="22" height="16" rx="3" fill="#e07bb0"/>
+<text x="982" y="773" font-size="14" fill="#1d2230">files the scripts make or read</text>
+<rect x="950" y="790" width="22" height="16" rx="3" fill="#7dc27a"/>
+<text x="982" y="803" font-size="14" fill="#1d2230">raw audio</text>
+</svg>

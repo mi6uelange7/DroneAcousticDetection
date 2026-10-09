@@ -14,7 +14,13 @@ from sklearn.metrics import average_precision_score
 
 from baseline import family_breakdown, load_manifest, load_splits
 
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# nvidia gpu if theres one, apple silicon gpu (mps) on a mac, otherwise plain cpu
+if torch.cuda.is_available():
+    DEVICE = torch.device("cuda")
+elif torch.backends.mps.is_available():
+    DEVICE = torch.device("mps")
+else:
+    DEVICE = torch.device("cpu")
 
 
 # loads every cached spectrogram for the given entries into memory up front.
@@ -23,13 +29,19 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class SpectrogramDataset(Dataset):
     def __init__(self, entries, cache_dir, mean, std):
         self.entries = entries
+        # for every clip, swap .wav for .npy and load its saved spectrogram from the cache folder.
+        # the / here glues folder + filename together, its not division
         specs = [np.load(Path(cache_dir) / Path(r["path"]).with_suffix(".npy")) for r in entries]
+        # stack every 64x65 grid into one big block, then (x - mean) / std on every number so
+        # everything sits around 0 in a small range. networks learn way better that way
         self.specs = (np.stack(specs).astype(np.float32) - mean) / std
         self.labels = np.array([int(r["label"]) for r in entries], dtype=np.float32)
 
     def __len__(self):
         return len(self.entries)
 
+    # pytorch calls __len__ and __getitem__ itself, names are fixed. [None, :, :] adds a channel
+    # dimension, 64x65 -> 1x64x65, cause conv layers want channels first and a spectrogram is mono
     def __getitem__(self, i):
         return self.specs[i][None, :, :], self.labels[i]
 
@@ -49,11 +61,15 @@ def train_norm_stats(entries, cache_dir):
 class DroneCNN(nn.Module):
     def __init__(self):
         super().__init__()
+        # each row is one block. conv slides a 3x3 window over the image looking for patterns
+        # (16, then 32, then 64 of em), relu keeps the strong matches and zeros the rest,
+        # maxpool halves the size. so it goes small details first, then bigger shapes
         self.features = nn.Sequential(
             nn.Conv2d(1, 16, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),
             nn.Conv2d(16, 32, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),
             nn.Conv2d(32, 64, 3, padding=1), nn.ReLU(), nn.AdaptiveAvgPool2d(1),
         )
+        # 64 "how much of each pattern" scores -> 1 drone score
         self.classifier = nn.Linear(64, 1)
 
     def forward(self, x):
@@ -69,7 +85,9 @@ def split_entries(entries, split_map):
 
 def train_model(train_ds, epochs):
     model = DroneCNN().to(DEVICE)
+    # adam adjusts the weights after every batch, lr is how big each nudge is
     opt = torch.optim.Adam(model.parameters(), lr=1e-3)
+    # scores how wrong a yes/no guess was. takes the raw output and does the sigmoid itself
     loss_fn = nn.BCEWithLogitsLoss()
     loader = DataLoader(train_ds, batch_size=64, shuffle=True)
 
@@ -78,10 +96,10 @@ def train_model(train_ds, epochs):
         total_loss = 0.0
         for specs, labels in loader:
             specs, labels = specs.to(DEVICE), labels.to(DEVICE)
-            opt.zero_grad()
-            loss = loss_fn(model(specs), labels)
-            loss.backward()
-            opt.step()
+            opt.zero_grad()                          # clear last batchs notes
+            loss = loss_fn(model(specs), labels)     # guess, then score how wrong it was
+            loss.backward()                          # work out which weights caused the error
+            opt.step()                               # nudge them a little to be less wrong
             total_loss += loss.item() * len(labels)
         print(f"  epoch {epoch + 1}/{epochs}  loss {total_loss / len(train_ds):.4f}")
 
@@ -97,9 +115,10 @@ def evaluate(model, test_entries, cache_dir, mean, std, split_name):
     probs = []
     for specs, _ in loader:
         logits = model(specs.to(DEVICE))
+        # sigmoid squishes the raw output into 0-1, so it reads as a drone probability
         probs.append(torch.sigmoid(logits).cpu().numpy())
     probs = np.concatenate(probs)
-    preds = (probs >= 0.5).astype(int)
+    preds = (probs >= 0.5).astype(int)  # the 50% line, 1 = drone
 
     labels = np.array([int(r["label"]) for r in test_entries])
     pr_auc = average_precision_score(labels, probs)
