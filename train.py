@@ -15,6 +15,7 @@ from sklearn.metrics import average_precision_score
 from baseline import family_breakdown, load_manifest, load_splits
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+SEED = 42  # same seed splits.py already uses, same reason: reruns should match
 
 
 # loads every cached spectrogram for the given entries into memory up front.
@@ -67,7 +68,12 @@ def split_entries(entries, split_map):
     return train, test
 
 
-def train_model(train_ds, epochs):
+def train_model(train_ds, epochs, seed=SEED):
+    # weight init and the dataloaders shuffle order both draw off this, so
+    # seeding it once here is enough to make reruns reproducible. found out
+    # the hard way, recall@0.5 swung from 27% to 70% run to run with no seed
+    # at all even though PR-AUC stayed exactly the same both times
+    torch.manual_seed(seed)
     model = DroneCNN().to(DEVICE)
     opt = torch.optim.Adam(model.parameters(), lr=1e-3)
     loss_fn = nn.BCEWithLogitsLoss()
@@ -122,6 +128,16 @@ def run_split(entries, split_map, cache_dir, epochs, split_name):
     model = train_model(train_ds, epochs)
 
     return evaluate(model, test_entries, cache_dir, mean, std, split_name)
+
+
+# no held-out portion here on purpose, used when something else (a separate
+# corpus) is the actual test set and none of this data overlaps with it
+def train_on_everything(entries, cache_dir, epochs, seed=SEED):
+    mean, std = train_norm_stats(entries, cache_dir)
+    train_ds = SpectrogramDataset(entries, cache_dir, mean, std)
+    print(f"training on {DEVICE}, {len(entries)} clips, {epochs} epochs, seed {seed}...")
+    model = train_model(train_ds, epochs, seed=seed)
+    return model, mean, std
 
 
 def main(cache_dir, manifest_path, splits_path, naive_splits_path, epochs):
