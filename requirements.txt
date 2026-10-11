@@ -35,5 +35,6 @@ six==1.17.0
 soundfile==0.14.0
 soxr==1.1.0
 threadpoolctl==3.6.0
+torch==2.14.1
 typing_extensions==4.16.0
 urllib3==2.7.0
