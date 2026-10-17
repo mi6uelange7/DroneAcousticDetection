@@ -13,8 +13,6 @@ import torch
 from features import SR, spectrogram_from_array
 from train import DroneCNN
 
-CAPTURE_SR = 48000  # almost every mic supports this natively, 16khz often doesnt
-
 
 def load_checkpoint(path):
     ckpt = torch.load(path, weights_only=False)
@@ -39,15 +37,39 @@ def predict(model, chunk, mean, std):
     return torch.sigmoid(model(spec)).item()
 
 
-def main(checkpoint_path, threshold):
+# usb device indices arent stable between runs, portaudio can re-number them
+# depending on whats plugged in that moment. name matching doesnt have that
+# problem, "snowball" always means the snowball
+def find_device(name_substring):
+    for i, d in enumerate(sd.query_devices()):
+        if d["max_input_channels"] > 0 and name_substring.lower() in d["name"].lower():
+            return i
+    sys.exit(f"no input device matching {name_substring!r}, run sd.query_devices() to see whats available")
+
+
+def main(checkpoint_path, threshold, device):
     model, mean, std, coef, intercept = load_checkpoint(checkpoint_path)
-    print(f"listening on {sd.query_devices(kind='input')['name']}, ctrl-c to stop")
+    sd.default.device = (device, None)
+    device_info = sd.query_devices(device)
+    # capture at whatever rate the device actually natively runs, not a
+    # hardcoded guess. a usb mic over raw alsa is often 44100, the same mic
+    # routed through the system audio layer is often 48000, found that out
+    # the hard way testing this on a few different devices
+    capture_sr = int(device_info["default_samplerate"])
+    print(f"listening on {device_info['name']} at {capture_sr}hz, ctrl-c to stop")
 
     try:
         while True:
-            chunk = sd.rec(CAPTURE_SR, samplerate=CAPTURE_SR, channels=1, dtype="float32")
-            sd.wait()
-            chunk = librosa.resample(chunk[:, 0], orig_sr=CAPTURE_SR, target_sr=SR)
+            # a transient audio-subsystem hiccup shouldnt kill a live demo
+            # over one bad second, log it and keep going instead
+            try:
+                chunk = sd.rec(capture_sr, samplerate=capture_sr, channels=1, dtype="float32")
+                sd.wait()
+            except sd.PortAudioError as e:
+                print(f"  (mic hiccup, skipping this second: {e})")
+                continue
+
+            chunk = librosa.resample(chunk[:, 0], orig_sr=capture_sr, target_sr=SR)
 
             raw_prob = predict(model, chunk, mean, std)
             prob = calibrate(raw_prob, coef, intercept)
@@ -60,4 +82,13 @@ def main(checkpoint_path, threshold):
 if __name__ == "__main__":
     checkpoint_path = sys.argv[1] if len(sys.argv) > 1 else "model.pt"
     threshold = float(sys.argv[2]) if len(sys.argv) > 2 else 0.5
-    main(checkpoint_path, threshold)
+    # a bare number still works as a raw index, anything else is a name to
+    # search for, e.g. "snowball"
+    device_arg = sys.argv[3] if len(sys.argv) > 3 else None
+    if device_arg is None:
+        device = sd.default.device[0]
+    elif device_arg.isdigit():
+        device = int(device_arg)
+    else:
+        device = find_device(device_arg)
+    main(checkpoint_path, threshold, device)
