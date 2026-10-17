@@ -4,5 +4,6 @@ __pycache__/
 *.pyc
 data/
 *.npy
+*.pt
 NOTES.txt
 status_update.html

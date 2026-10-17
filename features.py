@@ -8,16 +8,13 @@ from pathlib import Path
 import librosa
 import numpy as np
 
+from manifest_io import load_manifest
+
 SR = 16000              # native rate, dont let librosa resample
 N_FFT = 1024             # 64ms window
 HOP_LENGTH = 256          # 16ms step
 N_MELS = 64
 TARGET_SAMPLES = 16384  # 1.024s at 16khz, most clips are exactly this
-
-
-def load_manifest(manifest_path):
-    with open(manifest_path, newline="") as f:
-        return list(csv.DictReader(f))
 
 
 def fixed_length(y):
@@ -31,12 +28,18 @@ def fixed_length(y):
 
 # mel first cause its the standard starting point, power_to_db after cause
 # raw power values are tiny and swing over a huge range, db compresses that
-# down to something a model can actually learn from
-def spectrogram(wav_path):
-    y, _ = librosa.load(wav_path, sr=SR)
+# down to something a model can actually learn from. split from spectrogram()
+# below so live_detect.py can feed it audio straight from the mic instead of
+# needing a wav file on disk first
+def spectrogram_from_array(y):
     y = fixed_length(y)
     mel = librosa.feature.melspectrogram(y=y, sr=SR, n_fft=N_FFT, hop_length=HOP_LENGTH, n_mels=N_MELS)
     return librosa.power_to_db(mel).astype(np.float32)
+
+
+def spectrogram(wav_path):
+    y, _ = librosa.load(wav_path, sr=SR)
+    return spectrogram_from_array(y)
 
 
 def main(root, manifest_path, cache_dir):
