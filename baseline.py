@@ -11,13 +11,10 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import average_precision_score
 
+from manifest_io import load_manifest
+
 SR = 16000
 N_MFCC = 20
-
-
-def load_manifest(manifest_path):
-    with open(manifest_path, newline="") as f:
-        return list(csv.DictReader(f))
 
 
 def load_splits(splits_path):
@@ -60,7 +57,11 @@ def run_split(entries, X, y, split_map, split_name, exclude_silent):
     train_mask = keep & np.array([split_map[p] == "train" for p in paths])
     test_mask = keep & np.array([split_map[p] == "test" for p in paths])
 
-    clf = LogisticRegression(max_iter=1000)
+    # balanced weighting matters at training time, not just eval time. PR-AUC
+    # already stops accuracy from being misleading to look at, but the model
+    # itself was still fit treating every wrong answer the same regardless
+    # of how rare that class was
+    clf = LogisticRegression(max_iter=1000, class_weight="balanced")
     clf.fit(X[train_mask], y[train_mask])
     probs = clf.predict_proba(X[test_mask])[:, 1]
     preds = (probs >= 0.5).astype(int)

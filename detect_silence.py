@@ -14,10 +14,7 @@ from pathlib import Path
 
 import numpy as np
 
-
-def load_manifest(manifest_path):
-    with open(manifest_path, newline="") as f:
-        return list(csv.DictReader(f))
+from manifest_io import load_manifest
 
 
 # raw pcm rms, one pass, straight off the wav. dont need to go through the

@@ -8,11 +8,7 @@ from collections import Counter
 
 from sklearn.model_selection import StratifiedGroupKFold, train_test_split
 
-
-def load_manifest(manifest_file):
-    # reads csv
-    with open(manifest_file, newline="") as f:
-        return list(csv.DictReader(f))
+from manifest_io import load_manifest
 
 
 def dump_splits(out_file, entries, assign_map):

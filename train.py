@@ -94,8 +94,15 @@ def train_model(train_ds, epochs, seed=SEED):
     model = DroneCNN().to(DEVICE)
     # adam adjusts the weights after every batch, lr is how big each nudge is
     opt = torch.optim.Adam(model.parameters(), lr=1e-3)
-    # scores how wrong a yes/no guess was. takes the raw output and does the sigmoid itself
-    loss_fn = nn.BCEWithLogitsLoss()
+    # scores how wrong a yes/no guess was. takes the raw output and does the sigmoid itself.
+    # pos_weight scales up the cost of missing a drone, negatives outnumber
+    # positives about 8 to 1 so an unweighted loss barely minds getting
+    # those wrong. baseline.py's class_weight="balanced" is this same idea
+    # for logistic regression
+    neg = (train_ds.labels == 0).sum()
+    pos = (train_ds.labels == 1).sum()
+    pos_weight = torch.tensor(neg / pos, device=DEVICE)
+    loss_fn = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
     loader = DataLoader(train_ds, batch_size=64, shuffle=True)
 
     model.train()
